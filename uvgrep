@@ -26,6 +26,7 @@ ODTOPTIONS=""
 while getopts ":inx" option; do
   case $option in
     "?")
+      # shellcheck disable=SC2059
       printf "${MSG_BADOPTION}" "-$OPTARG"
       exit 1;;
     "i")
@@ -58,6 +59,7 @@ shift
 
 for file in $@; do
   if [ ! -f "$file" ]; then
+      # shellcheck disable=SC2059
     printf "${MSG_NOTFOUND}" "$file" >&2
     continue
   fi
@@ -106,6 +108,7 @@ for file in $@; do
       rm -rf ${dir} ;;
 
     *)
+      # shellcheck disable=SC2059
       printf "${MSG_BADFILETYPE}" "${file}" "${filetype}" >&2 ;;
   esac
 done
