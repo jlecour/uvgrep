@@ -81,12 +81,12 @@ for file in $@; do
       
     odt | ods | odp)
       unzip -caq "${file}" content.xml | xmllint --format - | sed -e 's/ *//' \
-        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | grep ${ODTOPTIONS} -h --color=always "${PATTERN}" \
         | sed -e "s|^|${file}:|" | remove_xml ;;
 
     docx)
       unzip -caq "${file}" word/document.xml | xmllint --format - | sed -e 's/ *//' \
-        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | grep ${ODTOPTIONS} -h --color=always "${PATTERN}" \
         | sed -e "s|^|${file}:|" | remove_xml ;;
 
     xlsx)
@@ -95,7 +95,7 @@ for file in $@; do
       pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
-        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | grep ${ODTOPTIONS} -h --color=always "${PATTERN}" \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
@@ -107,7 +107,7 @@ for file in $@; do
       pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
-        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | grep ${ODTOPTIONS} -h --color=always "${PATTERN}" \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
