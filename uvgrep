@@ -63,6 +63,7 @@ remove_xml() {
 PATTERN=$1
 shift
 
+# shellcheck disable=SC2068
 for file in $@; do
   if [ ! -f "$file" ]; then
     printf "${MSG_NOTFOUND}" "$file" >&2
