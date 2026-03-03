@@ -86,26 +86,26 @@ for file in $@; do
     xlsx)
       dir=$(mktemp); rm ${dir}; mkdir ${dir}
       unzip -ajq -d ${dir} "${file}" xl/worksheets/sheet*.xml xl/sharedStrings.xml
-      pushd ${dir} > /dev/null
+      pushd "${dir}" > /dev/null
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null
-      rm -rf ${dir} ;;
+      rm -rf "${dir}" ;;
 
     pptx)
-      dir=$(mktemp); rm ${dir}; mkdir ${dir}
-      unzip -ajq -d ${dir} "${file}" ppt/slides/slide*.xml
-      pushd ${dir} > /dev/null
+      dir=$(mktemp); rm "${dir}"; mkdir "${dir}"
+      unzip -ajq -d "${dir}" "${file}" ppt/slides/slide*.xml
+      pushd "${dir}" > /dev/null
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null
-      rm -rf ${dir} ;;
+      rm -rf "${dir}" ;;
 
     *)
       # shellcheck disable=SC2059
