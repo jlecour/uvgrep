@@ -74,20 +74,24 @@ for file in $@; do
   filetype=$(echo "${ext}" | tr '[:upper:]' '[:lower:]')
   case "${filetype}" in
     txt | sh | conf | pl | py | md)
-      grep -H --color ${OPTIONS} ${PATTERN} "${file}" ;;
+      grep -H --color ${OPTIONS} ${PATTERN} "${file}"
+      ;;
       
     pdf)
-      pdfgrep -H ${OPTIONS} ${PATTERN} "${file}" ;;
+      pdfgrep -H ${OPTIONS} ${PATTERN} "${file}"
+      ;;
       
     odt | ods | odp)
       unzip -caq "${file}" content.xml | xmllint --format - | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always "${PATTERN}" \
-        | sed -e "s|^|${file}:|" | remove_xml ;;
+        | sed -e "s|^|${file}:|" | remove_xml
+      ;;
 
     docx)
       unzip -caq "${file}" word/document.xml | xmllint --format - | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always "${PATTERN}" \
-        | sed -e "s|^|${file}:|" | remove_xml ;;
+        | sed -e "s|^|${file}:|" | remove_xml
+      ;;
 
     xlsx)
       dir=$(mktemp); rm ${dir}; mkdir ${dir}
@@ -99,7 +103,8 @@ for file in $@; do
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
-      rm -rf "${dir}" ;;
+      rm -rf "${dir}"
+      ;;
 
     pptx)
       dir=$(mktemp); rm "${dir}"; mkdir "${dir}"
@@ -111,9 +116,11 @@ for file in $@; do
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
-      rm -rf "${dir}" ;;
+      rm -rf "${dir}"
+      ;;
 
     *)
-      printf "${MSG_BADFILETYPE}" "${file}" "${filetype}" >&2 ;;
+      printf "${MSG_BADFILETYPE}" "${file}" "${filetype}" >&2
+      ;;
   esac
 done
