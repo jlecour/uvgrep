@@ -89,25 +89,25 @@ for file in $@; do
     xlsx)
       dir=$(mktemp); rm ${dir}; mkdir ${dir}
       unzip -ajq -d "${dir}" "${file}" xl/worksheets/sheet*.xml xl/sharedStrings.xml
-      pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
+      pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
-      popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
+      popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
       rm -rf "${dir}" ;;
 
     pptx)
       dir=$(mktemp); rm "${dir}"; mkdir "${dir}"
       unzip -ajq -d "${dir}" "${file}" ppt/slides/slide*.xml
-      pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
+      pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
-      popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
+      popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit 2; }
       rm -rf "${dir}" ;;
 
     *)
