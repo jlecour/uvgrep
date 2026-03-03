@@ -5,7 +5,7 @@
 # uvgrep: grep txt, PDF and LibreOffice files
 # Licensed under the GPL, version 3 (see LICENSE)
 
-if [ -n "$LANG" ] && [ ${LANG:0:2} == "de" ]; then
+if [ -n "$LANG" ] && [ "${LANG:0:2}" == "de" ]; then
   MSG_NOTFOUND="$0: %s: Datei nicht gefunden\n"
   MSG_BADFILETYPE="$0: %s: Kann keine Dateien mit Endung '.%s' verarbeiten\n"
   MSG_BADOPTION="$0: Ungueltige Option '%s'\n"
@@ -26,7 +26,7 @@ ODTOPTIONS=""
 while getopts ":inx" option; do
   case $option in
     "?")
-      printf "$MSG_BADOPTION" "-$OPTARG"
+      printf "${MSG_BADOPTION}" "-$OPTARG"
       exit 1;;
     "i")
       OPTIONS+=i
@@ -39,14 +39,14 @@ while getopts ":inx" option; do
       OPT_REMOVE_XML=1;;
   esac
 done
-if [ "$OPTIONS" != "" ]; then OPTIONS="-$OPTIONS"; fi
-if [ "$ODTOPTIONS" != "" ]; then ODTOPTIONS="-$ODTOPTIONS"; fi
+if [ "${OPTIONS}" != "" ]; then OPTIONS="-${OPTIONS}"; fi
+if [ "${ODTOPTIONS}" != "" ]; then ODTOPTIONS="-${ODTOPTIONS}"; fi
 shift $((OPTIND-1))
 
 # remove_xml: deletes opening and closing XML tags around text
 # if OPT_REMOVE_XML is set. Otherwise does nothing (cat)
 remove_xml() {
-  if [ -z "$OPT_REMOVE_XML" ]; then
+  if [ -z "${OPT_REMOVE_XML}" ]; then
     cat
   else
     sed -e 's:<[^>]*>::g' -e 's/^ *//'	
@@ -58,54 +58,54 @@ shift
 
 for file in $@; do
   if [ ! -f "$file" ]; then
-    printf "$MSG_NOTFOUND" "$file" >&2
+    printf "${MSG_NOTFOUND}" "$file" >&2
     continue
   fi
   
   ext="${file##*.}"
-  filetype=$(echo $ext | tr 'A-Z' 'a-z')
-  case $filetype in
+  filetype=$(echo "${ext}" | tr 'A-Z' 'a-z')
+  case "${filetype}" in
     txt | sh | conf | pl | py | md)
-      grep -H --color $OPTIONS $PATTERN "$file" ;;
+      grep -H --color ${OPTIONS} ${PATTERN} "${file}" ;;
       
     pdf)
-      pdfgrep -H $OPTIONS $PATTERN "$file" ;;
+      pdfgrep -H ${OPTIONS} ${PATTERN} "${file}" ;;
       
     odt | ods | odp)
-      unzip -caq "$file" content.xml | xmllint --format - | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -h --color=always $PATTERN \
-        | sed -e "s|^|$file:|" | remove_xml ;;
+      unzip -caq "${file}" content.xml | xmllint --format - | sed -e 's/ *//' \
+        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | sed -e "s|^|${file}:|" | remove_xml ;;
 
     docx)
-      unzip -caq "$file" word/document.xml | xmllint --format - | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -h --color=always $PATTERN \
-        | sed -e "s|^|$file:|" | remove_xml ;;
+      unzip -caq "${file}" word/document.xml | xmllint --format - | sed -e 's/ *//' \
+        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | sed -e "s|^|${file}:|" | remove_xml ;;
 
     xlsx)
-      dir=$(mktemp); rm $dir; mkdir $dir
-      unzip -ajq -d $dir "$file" xl/worksheets/sheet*.xml xl/sharedStrings.xml
-      pushd $dir > /dev/null
+      dir=$(mktemp); rm ${dir}; mkdir ${dir}
+      unzip -ajq -d ${dir} "${file}" xl/worksheets/sheet*.xml xl/sharedStrings.xml
+      pushd ${dir} > /dev/null
       for subfile in *.xml; do
-        xmllint --recover --format "$subfile" | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -h --color=always $PATTERN \
-        | sed -e "s|^|$file[/$subfile]:|" | remove_xml
+        xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
+        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null
-      rm -rf $dir ;;
+      rm -rf ${dir} ;;
 
     pptx)
-      dir=$(mktemp); rm $dir; mkdir $dir
-      unzip -ajq -d $dir "$file" ppt/slides/slide*.xml
-      pushd $dir > /dev/null
+      dir=$(mktemp); rm ${dir}; mkdir ${dir}
+      unzip -ajq -d ${dir} "${file}" ppt/slides/slide*.xml
+      pushd ${dir} > /dev/null
       for subfile in *.xml; do
-        xmllint --recover --format "$subfile" | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -h --color=always $PATTERN \
-        | sed -e "s|^|$file[/$subfile]:|" | remove_xml
+        xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
+        | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
+        | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
       popd > /dev/null
-      rm -rf $dir ;;
+      rm -rf ${dir} ;;
 
     *)
-      printf "$MSG_BADFILETYPE" "$file" "$filetype" >&2 ;;
+      printf "${MSG_BADFILETYPE}" "${file}" "${filetype}" >&2 ;;
   esac
 done
