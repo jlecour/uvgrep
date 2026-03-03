@@ -71,7 +71,7 @@ for file in $@; do
   fi
   
   ext="${file##*.}"
-  filetype=$(echo "${ext}" | tr 'A-Z' 'a-z')
+  filetype=$(echo "${ext}" | tr '[:upper:]' '[:lower:]')
   case "${filetype}" in
     txt | sh | conf | pl | py | md)
       grep -H --color ${OPTIONS} ${PATTERN} "${file}" ;;
