@@ -32,16 +32,18 @@ while getopts ":inx" option; do
     "?")
       # shellcheck disable=SC2059
       printf "${MSG_BADOPTION}" "-$OPTARG"
-      exit 1;;
+      exit 1
+      ;;
     "i")
       OPTIONS+=i
       ODTOPTIONS+=i
-      OPT_IGNORE=1;;
+      ;;
     "n")
       OPTIONS+=n
-      OPT_NUMBER=1;;
+      ;;
     "x")
-      OPT_REMOVE_XML=1;;
+      OPT_REMOVE_XML=1
+      ;;
   esac
 done
 if [ "${OPTIONS}" != "" ]; then OPTIONS="-${OPTIONS}"; fi
