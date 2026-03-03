@@ -5,14 +5,18 @@
 # uvgrep: grep txt, PDF and LibreOffice files
 # Licensed under the GPL, version 3 (see LICENSE)
 
+# shellcheck disable=SC2059
+
 if [ -n "$LANG" ] && [ "${LANG:0:2}" == "de" ]; then
   MSG_NOTFOUND="$0: %s: Datei nicht gefunden\n"
   MSG_BADFILETYPE="$0: %s: Kann keine Dateien mit Endung '.%s' verarbeiten\n"
   MSG_BADOPTION="$0: Ungueltige Option '%s'\n"
+  MSG_PUSHDPOPDERROR="$0: error moving around '%s'\n"
 else
   MSG_NOTFOUND="$0: %s: File not found\n"
   MSG_BADFILETYPE="$0: %s: Cannot handle '.%s' filetype\n"
   MSG_BADOPTION="$0: Invalid option '%s'\n"
+  MSG_PUSHDPOPDERROR="$0: error moving around '%s'\n"
 fi
 
 unset OPT_IGNORE
@@ -59,7 +63,6 @@ shift
 
 for file in $@; do
   if [ ! -f "$file" ]; then
-      # shellcheck disable=SC2059
     printf "${MSG_NOTFOUND}" "$file" >&2
     continue
   fi
@@ -85,30 +88,29 @@ for file in $@; do
 
     xlsx)
       dir=$(mktemp); rm ${dir}; mkdir ${dir}
-      unzip -ajq -d ${dir} "${file}" xl/worksheets/sheet*.xml xl/sharedStrings.xml
-      pushd "${dir}" > /dev/null
+      unzip -ajq -d "${dir}" "${file}" xl/worksheets/sheet*.xml xl/sharedStrings.xml
+      pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
-      popd > /dev/null
+      popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
       rm -rf "${dir}" ;;
 
     pptx)
       dir=$(mktemp); rm "${dir}"; mkdir "${dir}"
       unzip -ajq -d "${dir}" "${file}" ppt/slides/slide*.xml
-      pushd "${dir}" > /dev/null
+      pushd "${dir}" > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
       for subfile in *.xml; do
         xmllint --recover --format "${subfile}" | sed -e 's/ *//' \
         | grep ${ODTOPTIONS} -h --color=always ${PATTERN} \
         | sed -e "s|^|${file}[/${subfile}]:|" | remove_xml
       done
-      popd > /dev/null
+      popd > /dev/null || { printf "${MSG_PUSHDPOPDERROR}" "${dir}"; exit; }
       rm -rf "${dir}" ;;
 
     *)
-      # shellcheck disable=SC2059
       printf "${MSG_BADFILETYPE}" "${file}" "${filetype}" >&2 ;;
   esac
 done
