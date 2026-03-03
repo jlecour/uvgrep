@@ -22,7 +22,7 @@ OPTERR=0
 IFS=""
 OPTIONS=""
 ODTOPTIONS=""
-XMLLINT_INDENT=""
+
 while getopts ":inx" option; do
   case $option in
     "?")
